@@ -4,9 +4,9 @@ import { Button } from './ui/button';
 
 const flowKey = 'example-flow';
 
-const Sidebar = ({ reactFlowInstance }) => {
-	const [nodes, setNodes, onNodesChange] = useNodesState([]);
-	const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+const Sidebar = ({ reactFlowInstance, setNodes, setEdges }) => {
+	// const [nodes, setNodes, onNodesChange] = useNodesState([]);
+	// const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 	const { setViewport } = useReactFlow();
 
 	const onDragStart = (event, nodeType) => {
@@ -45,31 +45,35 @@ const Sidebar = ({ reactFlowInstance }) => {
 	}, [setEdges, setNodes, setViewport]);
 
 	return (
-		<aside className='w-1/4 h-full'>
+		<aside className='w-1/4 h-full space-y-5'>
 			<div className=''>You can drag these nodes to the pane on the right.</div>
 			<div
-				className=''
+				className='text-center border rounded-md border-slate-900'
 				onDragStart={(event) => onDragStart(event, 'input')}
 				draggable>
 				Input Node
 			</div>
 			<div
-				className=''
+				className='text-center border rounded-md border-slate-900'
 				onDragStart={(event) => onDragStart(event, 'default')}
 				draggable>
 				Default Node
 			</div>
 			<div
-				className=''
+				className='text-center border rounded-md border-slate-900'
 				onDragStart={(event) => onDragStart(event, 'output')}
 				draggable>
 				Output Node
 			</div>
 			<Panel
 				position='bottom-left'
-				className='flex gap-2'>
+				className='flex gap-2 pb-2'>
 				<Button onClick={onSave}>save</Button>
-				<Button onClick={onRestore}>restore</Button>
+				<Button
+					variant='secondary'
+					onClick={onRestore}>
+					restore
+				</Button>
 			</Panel>
 		</aside>
 	);
