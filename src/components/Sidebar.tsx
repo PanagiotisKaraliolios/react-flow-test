@@ -1,15 +1,19 @@
-import { useCallback, useState } from 'react';
-import { Panel, useEdgesState, useNodesState, useReactFlow } from 'reactflow';
+import { DragEvent, useCallback } from 'react';
+import { Panel, useReactFlow } from 'reactflow';
 import { Button } from './ui/button';
 
 const flowKey = 'example-flow';
 
-const Sidebar = ({ reactFlowInstance, setNodes, setEdges }) => {
-	// const [nodes, setNodes, onNodesChange] = useNodesState([]);
-	// const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+interface SidebarProps {
+	reactFlowInstance: any;
+	setNodes: any;
+	setEdges: any;
+}
+
+const Sidebar = ({ reactFlowInstance, setNodes, setEdges }: SidebarProps) => {
 	const { setViewport } = useReactFlow();
 
-	const onDragStart = (event, nodeType) => {
+	const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
 		event.dataTransfer.setData('application/reactflow', nodeType);
 		event.dataTransfer.effectAllowed = 'move';
 	};
@@ -30,9 +34,9 @@ const Sidebar = ({ reactFlowInstance, setNodes, setEdges }) => {
 
 	const onRestore = useCallback(() => {
 		const restoreFlow = async () => {
-			const flow = JSON.parse(localStorage.getItem(flowKey));
+			const flow = JSON.parse(localStorage.getItem(flowKey) || 'null');
 
-			if (flow) {
+			if (flow && flow !== 'null') {
 				const { x = 0, y = 0, zoom = 1 } = flow.viewport;
 				console.log('flow:', flow);
 				setNodes(flow.nodes || []);

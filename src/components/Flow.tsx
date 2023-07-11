@@ -1,7 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
 import ReactFlow, {
 	Background,
+	Connection,
 	Controls,
+	Edge,
+	EdgeChange,
+	NodeChange,
+	ReactFlowInstance,
 	addEdge,
 	applyEdgeChanges,
 	applyNodeChanges,
@@ -15,29 +20,48 @@ let id = 0;
 const getId = () => `dndnode_${id++}`;
 
 const Flow = () => {
-	const reactFlowWrapper = useRef(null);
+	const reactFlowWrapper = useRef<HTMLDivElement>(null);
 	const [nodes, setNodes] = useNodesState([]);
 	const [edges, setEdges] = useEdgesState([]);
-	const [reactFlowInstance, setReactFlowInstance] = useState(null);
+	const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
-	const onNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
-	const onEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
+	const onNodesChange = useCallback(
+		(changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+		[setNodes]
+	);
+	const onEdgesChange = useCallback(
+		(changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+		[setEdges]
+	);
 
-	const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
-	const onDragOver = useCallback((event) => {
+	const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+	const onDragOver = useCallback((event: { preventDefault: () => void; dataTransfer: { dropEffect: string } }) => {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = 'move';
 	}, []);
 
 	const onDrop = useCallback(
-		(event) => {
+		(event: {
+			preventDefault: () => void;
+			dataTransfer: { getData: (arg0: string) => any };
+			clientX: number;
+			clientY: number;
+		}) => {
 			event.preventDefault();
+
+			if (!reactFlowWrapper.current) {
+				return;
+			}
 
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 			const type = event.dataTransfer.getData('application/reactflow');
 
 			// Check if the dropped element is valid
 			if (typeof type === 'undefined' || !type) {
+				return;
+			}
+
+			if (reactFlowInstance === null) {
 				return;
 			}
 
@@ -54,7 +78,7 @@ const Flow = () => {
 
 			setNodes((nds) => nds.concat(newNode));
 		},
-		[reactFlowInstance]
+		[reactFlowInstance, setNodes]
 	);
 	return (
 		<div className='flex flex-row flex-grow h-full gap-2 p-2 bg-slate-300'>
