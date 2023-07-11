@@ -57,7 +57,7 @@ const Flow = () => {
 		[reactFlowInstance]
 	);
 	return (
-		<div className='flex flex-row flex-grow h-full gap-2 p-2 bg-slate-500'>
+		<div className='flex flex-row flex-grow h-full gap-2 p-2 bg-slate-300'>
 			{/* Sidebar */}
 			<Sidebar
 				reactFlowInstance={reactFlowInstance}
